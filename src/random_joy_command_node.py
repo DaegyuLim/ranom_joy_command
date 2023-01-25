@@ -9,37 +9,34 @@ class RandomJoyNode:
     def __init__(self):
         self.pub = rospy.Publisher("joy", Joy, queue_size=10)
         self.rate = rospy.Rate(30) # 30hz
+    
+        self.last_vel_x_select_secs = 0
+        self.last_vel_y_select_secs = 0
+        self.last_vel_w_select_secs = 0
         
-        self.last_vel_x_select_secs = 0;
-        self.last_vel_y_select_secs = 0;
-        self.last_vel_w_select_secs = 0;
+        self.vel_x_duration = 0
+        self.vel_y_duration = 0
+        self.vel_w_duration = 0
         
-        self.vel_x_duration = 0;
-        self.vel_y_duration = 0;
-        self.vel_w_duration = 0;
-        
-        self.vel_x = 0.0;
-        self.vel_y = 0.0;
-        self.vel_w = 0.0;
+        self.vel_x = 0.0
+        self.vel_y = 0.0
+        self.vel_w = 0.0
     
     def random_velocity(self, current_time): 
-
-        
-        
         if current_time > self.last_vel_x_select_secs + self.vel_x_duration:
             self.last_vel_x_select_secs = current_time
-            self.vel_x_duration = random.uniform(1, 5)
-            self.vel_x = random.random()
+            self.vel_x_duration = random.uniform(5, 10)
+            self.vel_x = random.uniform(-1.0, 1.0)
             
         if current_time > self.last_vel_y_select_secs + self.vel_y_duration:
             self.last_vel_y_select_secs = current_time
-            self.vel_y_duration = random.uniform(1, 5)
-            self.vel_y = random.random()
+            self.vel_y_duration = random.uniform(5, 10)
+            self.vel_y = random.uniform(-1.0, 1.0)
         
         if current_time > self.last_vel_w_select_secs + self.vel_w_duration:
             self.last_vel_w_select_secs = current_time
-            self.vel_w_duration = random.uniform(1, 5)
-            self.vel_w = random.random()
+            self.vel_w_duration = random.uniform(5, 10)
+            self.vel_w = random.uniform(-1.0, 1.0)
         
         
         return [self.vel_y, self.vel_x, 0.0, self.vel_w, 0.0, 0,0, 0,0, 0,0, 0,0]  
@@ -53,10 +50,10 @@ class RandomJoyNode:
         while not rospy.is_shutdown():
             joy_msg.header.stamp = rospy.Time.now()	#현재 시각 담음
             joy_msg.header.seq = count		# count 변수 값 담음
-            # joy_msg.axes = self.random_velocity(joy_msg.header.stamp.secs)
-            joy_msg.axes[0] = 1.0
-            joy_msg.axes[1] = 1.0
-            joy_msg.axes[3] = 1.0
+            joy_msg.axes = self.random_velocity(joy_msg.header.stamp.secs)
+            # joy_msg.axes[0] = 0.0
+            # joy_msg.axes[1] = 0.5
+            # joy_msg.axes[3] = 1.0
             # 터미널에 출력
             # rospy.loginfo("send time(sec) = %d", joy_msg.header.stamp.secs)
             # rospy.loginfo("send seq = %d", joy_msg.header.seq)
